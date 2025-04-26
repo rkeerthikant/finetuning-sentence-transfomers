@@ -2,7 +2,7 @@
 
 import nbformat
 import os
-#test comments
+
 
 def clean_metadata(notebook_path):
     with open(notebook_path, "r", encoding="utf-8") as f:
