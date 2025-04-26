@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
 import nbformat
+import sys
 import os
 
 def clean_metadata(notebook_path):
+    if not os.path.exists(notebook_path):
+        return False
+
     with open(notebook_path, "r", encoding="utf-8") as f:
         nb = nbformat.read(f, as_version=nbformat.NO_CONVERT)
 
@@ -28,16 +32,12 @@ def clean_metadata(notebook_path):
             nbformat.write(nb, f)
     return changed
 
-def find_notebooks():
-    for root, _, files in os.walk("."):
-        for file in files:
-            if file.endswith(".ipynb"):
-                yield os.path.join(root, file)
-
 if __name__ == "__main__":
     any_changes = False
-    for notebook in find_notebooks():
-        if clean_metadata(notebook):
+    files = sys.argv[1:]
+
+    for notebook in files:
+        if notebook.endswith(".ipynb") and clean_metadata(notebook):
             any_changes = True
 
     if any_changes:
