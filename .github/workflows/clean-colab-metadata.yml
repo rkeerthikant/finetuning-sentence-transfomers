@@ -6,7 +6,7 @@ on:
       - "**/*.ipynb"
 
 permissions:
-  contents: write  # <-- Required to push changes
+  contents: write
 
 jobs:
   clean-metadata:
@@ -25,12 +25,23 @@ jobs:
         run: |
           pip install nbformat
 
-      - name: Clean Colab metadata from notebooks
-        run: python .github/scripts/clean_colab_metadata.py
+      - name: Get list of modified .ipynb files
+        id: notebooks
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth=1 || true
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} -- '*.ipynb')
+          echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Clean only changed notebooks
+        run: |
+          echo "${{ steps.notebooks.outputs.changed_files }}" > changed_files.txt
+          xargs python .github/scripts/clean_colab_metadata.py < changed_files.txt
 
       - name: Commit and push changes if metadata was cleaned
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KEERTHI_PAT: ${{ secrets.KEERTHI_PAT }}
         run: |
           if [[ `git status --porcelain` ]]; then
             git config --global user.name "github-actions[bot]"
