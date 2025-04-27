@@ -28,7 +28,7 @@ jobs:
       - name: Get list of modified .ipynb files
         id: notebooks
         run: |
-          git fetch origin ${{ github.base_ref }} --depth=1 || true
+          git fetch origin ${{ github.base_ref }} || true
           CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} -- '*.ipynb')
           echo "changed_files<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
