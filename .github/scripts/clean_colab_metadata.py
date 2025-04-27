@@ -4,6 +4,7 @@ import nbformat
 import sys
 import os
 
+
 def clean_metadata(notebook_path):
     if not os.path.exists(notebook_path):
         return False
